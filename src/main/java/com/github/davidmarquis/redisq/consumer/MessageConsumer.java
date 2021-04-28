@@ -106,6 +106,10 @@ public class MessageConsumer<T> {
         threadingStrategy.stop();
     }
 
+    public Boolean delMessageById(String messageId){
+        return redisOps.delMessageById(queue.getQueueName(), messageId);
+    }
+
     protected void processNextMessage() {
 
         queue.dequeue(consumerId, new MessageCallback() {

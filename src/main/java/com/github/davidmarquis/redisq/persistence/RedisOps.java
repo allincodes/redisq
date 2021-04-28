@@ -26,6 +26,10 @@ public class RedisOps {
     @Autowired(required = false)
     private MessageConverter messageConverter = new DefaultMessageConverter();
 
+    public void setPayloadSerializer(PayloadSerializer payloadSerializer) {
+        this.payloadSerializer = payloadSerializer;
+    }
+
     public void ensureConsumerRegistered(String queueName, String consumerId) {
         BoundSetOperations<String, String> ops = redisTemplate.boundSetOps(keyForRegisteredConsumers(queueName));
         ops.add(consumerId);
@@ -67,6 +71,11 @@ public class RedisOps {
         Map<String, String> messageData = ops.entries();
 
         return messageConverter.toMessage(messageData, payloadType, payloadSerializer);
+    }
+
+    public Boolean delMessageById(String queueName, String id) {
+        String messageKey = keyForMessage(queueName, id);
+        return redisTemplate.delete(messageKey);
     }
 
     public String dequeueMessageFromHead(String queueName, String consumerId, long timeoutSeconds) {
